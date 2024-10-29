@@ -31,7 +31,16 @@ static void heapinit() {
 }
 
 void* heapalloc(size_t size) {
-
+    if (heapdata.heap == NULL) heapinit();
+    if (size > heapdata.freedspace) {
+        perror("Reached max heap capacity");
+        exit(1);
+    }
+    if (size < 1) {
+        perror("Must request size greater than 0");
+        exit(1);
+    }
+    
     return 0;
 }
 
