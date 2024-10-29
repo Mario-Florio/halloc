@@ -1,9 +1,13 @@
 #include "heapalloc.h"
 
+#define CAPACITY 640000
+
 typedef struct {
     void* heap;
     int freedspace;
 } Heapdata;
+
+char bitmap[CAPACITY] = {  0 * CAPACITY };
 
 static Heapdata heapdata;
 
