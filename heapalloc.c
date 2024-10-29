@@ -4,9 +4,11 @@
 #include <unistd.h>
 
 #include "heapalloc.h"
-#include "debugger/debugger.h"
+#include "build.h"
 
 #ifdef DEBUGGER
+    #include "utils/debugger/debugger.h"
+
     #define CAPACITY 10
     #define PRINTBITMAP(TITLE, BITMAP) printbitmap(TITLE, BITMAP)
 #else
@@ -53,16 +55,16 @@ void* heapalloc(size_t size) {
     }
 
     int start = 0, freewindow = 0, found = 0;
-    for (int i = 1; i < CAPACITY+1; i++) {
+    for (int i = 0; i < CAPACITY; i++) {
         if (freewindow == size) {
             found = 1;
         }
 
-        if (bitmap[i-1] == 0) {
+        if (bitmap[i] == 0) {
             freewindow++;
         } else {
             freewindow = 0;
-            start = i;
+            start = i+1;
         }
     }
 
