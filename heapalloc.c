@@ -61,14 +61,23 @@ void* heapalloc(size_t size) {
         exit(1);
     }
 
-    int start = 0, freewindow = 0;
+    int start = 0, freewindow = 0, found = 0;
     for (int i = 1; i < CAPACITY+1; i++) {
+        if (freewindow == size) {
+            found = 1;
+        }
+
         if (bitmap[i-1] == 0) {
             freewindow++;
         } else {
             freewindow = 0;
             start = i;
         }
+    }
+
+    if (!found) {
+        perror("Unable to fulfill request");
+        exit(1);
     }
 
     for (int i = start; i < start+size; i++) {
