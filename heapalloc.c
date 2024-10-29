@@ -4,23 +4,12 @@
 #include <unistd.h>
 
 #include "heapalloc.h"
-#include "build.h"
-
-#ifdef DEBUGGER
-    #include "utils/debugger/debugger.h"
-
-    #define CAPACITY 10
-    #define PRINTBITMAP(TITLE, BITMAP) printbitmap(TITLE, BITMAP)
-#else
-    #define CAPACITY 640000
-#endif
+#include "bitmap.h"
 
 typedef struct {
     void* heap;
     int freedspace;
 } Heapdata;
-
-char bitmap[CAPACITY] = { 0 * CAPACITY };
 
 static Heapdata heapdata;
 
