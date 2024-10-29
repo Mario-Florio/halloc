@@ -5,7 +5,24 @@
 
 #include "heapalloc.h"
 
+#define DEBUGGER
+
+#ifdef DEBUGGER
+
+#define CAPACITY 10
+#define PRINTBITMAP(TITLE) \
+    printf("%s\n", TITLE); \
+    for (int i = 0; i < CAPACITY; i++) { \
+        printf("%d ", bitmap[i]); \
+    } \
+    printf("\n"); \
+
+#else
+
 #define CAPACITY 640000
+#define PRINTBITMAP(TITLE) printf("\nDEBUGGER IS UNDEFINED: REMOVE BITMAP PRINTER\n");
+
+#endif
 
 typedef struct {
     void* heap;
@@ -29,6 +46,8 @@ static void heapinit() {
 
     heapdata.heap = address_space;
     heapdata.freedspace = CAPACITY;
+
+    PRINTBITMAP("HEAP INIT");
 }
 
 void* heapalloc(size_t size) {
@@ -59,6 +78,8 @@ void* heapalloc(size_t size) {
 
     void* memaddress = (void*)heapdata.heap+start;
     heapdata.freedspace -= size;
+
+    PRINTBITMAP("HEAP ALLOC");
 
     return memaddress;
 }
