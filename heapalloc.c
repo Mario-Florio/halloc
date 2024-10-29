@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <unistd.h>
@@ -51,7 +52,15 @@ void* heapalloc(size_t size) {
         }
     }
 
-    return 0;
+    for (int i = start; i < start+size; i++) {
+        bitmap[i] = 1;
+    }
+    bitmap[start] = size;
+
+    void* memaddress = (void*)heapdata.heap+start;
+    heapdata.freedspace -= size;
+
+    return memaddress;
 }
 
 void heapfree(void* ptr) {
