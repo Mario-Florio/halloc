@@ -18,7 +18,7 @@ typedef struct {
     int freedspace;
 } Heapdata;
 
-char bitmap[CAPACITY] = {  0 * CAPACITY };
+char bitmap[CAPACITY] = { 0 * CAPACITY };
 
 static Heapdata heapdata;
 
