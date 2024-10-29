@@ -4,24 +4,13 @@
 #include <unistd.h>
 
 #include "heapalloc.h"
-
-#define DEBUGGER
+#include "debugger/debugger.h"
 
 #ifdef DEBUGGER
-
-#define CAPACITY 10
-#define PRINTBITMAP(TITLE) \
-    printf("%s\n", TITLE); \
-    for (int i = 0; i < CAPACITY; i++) { \
-        printf("%d ", bitmap[i]); \
-    } \
-    printf("\n"); \
-
+    #define CAPACITY 10
+    #define PRINTBITMAP(TITLE, BITMAP) printbitmap(TITLE, BITMAP)
 #else
-
-#define CAPACITY 640000
-#define PRINTBITMAP(TITLE) printf("\nDEBUGGER IS UNDEFINED: REMOVE BITMAP PRINTER\n");
-
+    #define CAPACITY 640000
 #endif
 
 typedef struct {
@@ -47,7 +36,9 @@ static void heapinit() {
     heapdata.heap = address_space;
     heapdata.freedspace = CAPACITY;
 
-    PRINTBITMAP("HEAP INIT");
+    #ifdef DEBUGGER
+        PRINTBITMAP("HEAP INIT", bitmap);
+    #endif
 }
 
 void* heapalloc(size_t size) {
@@ -88,7 +79,9 @@ void* heapalloc(size_t size) {
     void* memaddress = (void*)heapdata.heap+start;
     heapdata.freedspace -= size;
 
-    PRINTBITMAP("HEAP ALLOC");
+    #ifdef DEBUGGER
+        PRINTBITMAP("HEAP ALLOC", bitmap);
+    #endif
 
     return memaddress;
 }
@@ -112,7 +105,9 @@ void heapfree(void* ptr) {
         exit(1);
     }
 
-    PRINTBITMAP("HEAP FREE");
+    #ifdef DEBUGGER
+        PRINTBITMAP("HEAP FREE", bitmap);
+    #endif
 
     heapdata.freedspace += chunksize;
 }
