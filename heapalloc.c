@@ -40,7 +40,17 @@ void* heapalloc(size_t size) {
         perror("Must request size greater than 0");
         exit(1);
     }
-    
+
+    int start = 0, freewindow = 0;
+    for (int i = 1; i < CAPACITY+1; i++) {
+        if (bitmap[i-1] == 0) {
+            freewindow++;
+        } else {
+            freewindow = 0;
+            start = i;
+        }
+    }
+
     return 0;
 }
 
