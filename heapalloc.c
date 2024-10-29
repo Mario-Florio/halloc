@@ -94,5 +94,25 @@ void* heapalloc(size_t size) {
 }
 
 void heapfree(void* ptr) {
-    
+    int chunksize = 0;
+    for (int i = 0; i < CAPACITY; i++) {
+        if (heapdata.heap+i == ptr) {
+            chunksize = bitmap[i]+i;
+            int j = i;
+            while (j < chunksize) {
+                bitmap[j] = 0;
+                j++;
+            }
+            break;
+        }
+    }
+
+    if (chunksize == 0) {
+        perror("Memory address is already free");
+        exit(1);
+    }
+
+    PRINTBITMAP("HEAP FREE");
+
+    heapdata.freedspace += chunksize;
 }
