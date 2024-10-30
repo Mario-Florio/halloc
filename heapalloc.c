@@ -33,6 +33,8 @@ static void heapinit() {
     #endif
 }
 
+static int getSmallestFreeSpace(size_t size);
+
 void* heapalloc(size_t size) {
     if (heapdata.heap == NULL) heapinit();
     if (size > heapdata.freedspace) {
@@ -45,21 +47,9 @@ void* heapalloc(size_t size) {
     }
 
     char* bitmap = getbitmap();
-    int start = 0, freewindow = 0, found = 0;
-    for (int i = 0; i < CAPACITY; i++) {
-        if (freewindow == size) {
-            found = 1;
-        }
+    int start = getSmallestFreeSpace(size);
 
-        if (bitmap[i] == 0) {
-            freewindow++;
-        } else {
-            freewindow = 0;
-            start = i+1;
-        }
-    }
-
-    if (!found) {
+    if (start == -1) {
         perror("Unable to fulfill request");
         exit(1);
     }
@@ -98,10 +88,42 @@ void heapfree(void* ptr) {
         perror("Memory address is already free");
         exit(1);
     }
+    
 
     #ifdef DEBUGGER
         PRINTBITMAP("HEAP FREE", bitmap);
     #endif
 
+
     heapdata.freedspace += chunksize;
+}
+
+// UTILS
+static int getSmallestFreeSpace(size_t size) {
+    char* bitmap = getbitmap();
+    int currIdx = 0, currSpace = 0, found = 0;
+    int smallestIdx = 0, smallestSpace = CAPACITY+1;
+
+    for (int i = 0; i < CAPACITY; i++) {
+        if (currSpace == size) found = 1;
+        if (smallestSpace == size) break;
+        if (bitmap[i] == 0) {
+            currSpace++;
+        } else {
+            if (currSpace >= size && currSpace < smallestSpace) {
+                smallestSpace = currSpace;
+                smallestIdx = currIdx;
+            }
+            currIdx = i+1;
+            currSpace = 0;
+        }
+    }
+
+    // used in cases where 'else' block doesnt run
+    if (currSpace >= size && currSpace < smallestSpace) {
+        smallestSpace = currSpace;
+        smallestIdx = currIdx;
+    }
+
+    return found ? smallestIdx : -1;
 }

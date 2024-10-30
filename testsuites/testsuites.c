@@ -5,23 +5,30 @@
 void heapalloc_tests();
 void heapfree_tests();
 
+static void freebitmap();
+
 void heap_testsuites() {
-    suite("HEAP ALLOC TESTS", heapalloc_tests);
-    suite("HEAP FREE TESTS", heapfree_tests);
+    suite("======HEAP ALLOC TESTS======", heapalloc_tests);
+    suite("======HEAP FREE TESTS=======", heapfree_tests);
 }
 
 void heapalloc_tests() {
     char* bitmap = getbitmap();
 
-    void* mem1 = heapalloc(sizeof(char) * 2);
+    heapalloc(sizeof(char) * 2);
     it("Allocates to appropriate place on bitmap", bitmap[0] != 0 && bitmap[1] != 0);
-    void* mem2 = heapalloc(sizeof(int));
+
+    heapalloc(sizeof(int));
     void* mem3 = heapalloc(sizeof(char) * 2);
     it("Sets value of first bit of allocated to chunk to requested size", bitmap[6] == 2);
 
-    heapfree(mem1);
-    heapfree(mem2);
+    heapalloc(sizeof(int));
     heapfree(mem3);
+
+    heapalloc(sizeof(char));
+    it("Allocates memory to first smallest chunk of freed space", bitmap[6] == 1);
+
+    freebitmap();
 }
 
 void heapfree_tests() {
@@ -32,7 +39,15 @@ void heapfree_tests() {
 
     heapfree(mem2);
     it("Frees accurate memory bits", bitmap[2] == 0 && bitmap[3] == 0 &&
-                                     bitmap[4] == 0 && bitmap[5] == 0);
+                                     bitmap[4] == 0 && bitmap[5] == 0   );
 
     heapfree(mem1);
+}
+
+// UTILS
+static void freebitmap() {
+    char* bitmap = getbitmap();
+    for (int i = 0; i < CAPACITY; i++) {
+        bitmap[i] = 0;
+    }
 }
