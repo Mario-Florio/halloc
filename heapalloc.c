@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 #include "heapalloc.h"
-#include "bitmap.h"
+#include "bitmap/bitmap.h"
 
 typedef struct {
     void* heap;
@@ -15,9 +15,9 @@ static Heapdata heapdata;
 
 static void heapinit() {
     void* address_space = mmap(NULL, CAPACITY,
-                          PROT_READ|PROT_WRITE,
-                          MAP_PRIVATE|MAP_ANONYMOUS,
-                          0, 0);
+                               PROT_READ|PROT_WRITE,
+                               MAP_PRIVATE|MAP_ANONYMOUS,
+                               0, 0);
 
     if (address_space == MAP_FAILED) {
         perror("mmap");
@@ -28,6 +28,7 @@ static void heapinit() {
     heapdata.freedspace = CAPACITY;
 
     #ifdef DEBUGGER
+        char* bitmap = getbitmap();
         PRINTBITMAP("HEAP INIT", bitmap);
     #endif
 }
@@ -43,6 +44,7 @@ void* heapalloc(size_t size) {
         exit(1);
     }
 
+    char* bitmap = getbitmap();
     int start = 0, freewindow = 0, found = 0;
     for (int i = 0; i < CAPACITY; i++) {
         if (freewindow == size) {
@@ -78,6 +80,7 @@ void* heapalloc(size_t size) {
 }
 
 void heapfree(void* ptr) {
+    char* bitmap = getbitmap();
     int chunksize = 0;
     for (int i = 0; i < CAPACITY; i++) {
         if (heapdata.heap+i == ptr) {
