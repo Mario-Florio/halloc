@@ -4,12 +4,15 @@
 #include <unistd.h>
 
 #include "heapalloc.h"
-#include "bitmap/bitmap.h"
+
+#define CAPACITY 640000
 
 typedef struct {
     void* heap;
     int freedspace;
 } Heapdata;
+
+char bitmap[CAPACITY] = { 0 * CAPACITY };
 
 static Heapdata heapdata;
 
@@ -26,11 +29,6 @@ static void heapinit() {
 
     heapdata.heap = address_space;
     heapdata.freedspace = CAPACITY;
-
-    #ifdef DEBUGGER
-        char* bitmap = getbitmap();
-        PRINTBITMAP("HEAP INIT", bitmap);
-    #endif
 }
 
 static int getSmallestFreeSpace(size_t size);
@@ -46,7 +44,6 @@ void* heapalloc(size_t size) {
         exit(1);
     }
 
-    char* bitmap = getbitmap();
     int start = getSmallestFreeSpace(size);
 
     if (start == -1) {
@@ -62,15 +59,10 @@ void* heapalloc(size_t size) {
     void* memaddress = (void*)heapdata.heap+start;
     heapdata.freedspace -= size;
 
-    #ifdef DEBUGGER
-        PRINTBITMAP("HEAP ALLOC", bitmap);
-    #endif
-
     return memaddress;
 }
 
 void heapfree(void* ptr) {
-    char* bitmap = getbitmap();
     int chunksize = 0;
     for (int i = 0; i < CAPACITY; i++) {
         if (heapdata.heap+i == ptr) {
@@ -89,18 +81,11 @@ void heapfree(void* ptr) {
         exit(1);
     }
     
-
-    #ifdef DEBUGGER
-        PRINTBITMAP("HEAP FREE", bitmap);
-    #endif
-
-
     heapdata.freedspace += chunksize;
 }
 
 // UTILS
 static int getSmallestFreeSpace(size_t size) {
-    char* bitmap = getbitmap();
     int currIdx = 0, currSpace = 0, found = 0;
     int smallestIdx = 0, smallestSpace = CAPACITY+1;
 
@@ -119,7 +104,7 @@ static int getSmallestFreeSpace(size_t size) {
         }
     }
 
-    // used in cases where 'else' block doesnt run
+    // used in cases where "else" block doesn't run
     if (currSpace >= size && currSpace < smallestSpace) {
         smallestSpace = currSpace;
         smallestIdx = currIdx;
