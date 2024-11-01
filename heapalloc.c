@@ -15,6 +15,7 @@ typedef struct {
 static Heap heap;
 
 static void throwerror(char* name);
+static void setbitmap(int start, size_t size);
 static int getsmallestfreespace(size_t size);
 
 static void heapinit() {
@@ -40,11 +41,7 @@ void* heapalloc(size_t size) {
 
     if (start == -1) throwerror("Unable to fulfill request");
 
-    // allocate space in bitmap
-    for (int i = start; i < start+size; i++) {
-        bitmap[i] = 1;
-    }
-    bitmap[start] = size;
+    setbitmap(start, size);
 
     void* mem_address = (void*)heap.start+start;
     heap.free_space -= size;
@@ -77,6 +74,14 @@ void heapfree(void* ptr) {
 static void throwerror(char* name) {
     perror(name);
     exit(1);
+}
+
+static void setbitmap(int start, size_t size) {
+    // allocate space in bitmap
+    for (int i = start; i < start+size; i++) {
+        bitmap[i] = 1;
+    }
+    bitmap[start] = size;
 }
 
 static int getsmallestfreespace(size_t size) {
