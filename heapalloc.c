@@ -35,10 +35,12 @@ void* heapalloc(size_t size) {
     if (size > heap.free_space) throwerror("Reached max heap capacity");
     if (size < 1) throwerror("Must request size greater than 0");
 
+    // get smallest free space in bitmap
     int start = getsmallestfreespace(size);
 
     if (start == -1) throwerror("Unable to fulfill request");
 
+    // allocate space in bitmap
     for (int i = start; i < start+size; i++) {
         bitmap[i] = 1;
     }
@@ -56,6 +58,8 @@ void heapfree(void* ptr) {
         if (heap.start+i == ptr) {
             chunk_size = bitmap[i];
             int j = i;
+
+            // free space in bitmap
             while (j < chunk_size+i) {
                 bitmap[j] = 0;
                 j++;
