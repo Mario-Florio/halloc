@@ -31,7 +31,6 @@ static void heapinit() {
 }
 
 void* heapalloc(size_t size) {
-    if (size > 127) throwerror("Sizes greater than 127 bits not supported");
     if (heap.start == NULL) heapinit();
     if (size > heap.free_space) throwerror("Reached max heap capacity");
     if (size < 1) throwerror("Must request size greater than 0");
@@ -53,10 +52,15 @@ void heapfree(void* ptr) {
     int chunk_size = 0;
     for (int i = 0; i < CAPACITY; i++) {
         if (heap.start+i == ptr) {
-            chunk_size = bitmap[i];
-            int j = i;
+            // get size values stored in bits
+            int k = i;
+            while (bitmap[k] > 1) {
+                chunk_size += bitmap[k]-1;
+                k++;
+            }
 
             // free space in bitmap
+            int j = i;
             while (j < chunk_size+i) {
                 bitmap[j] = 0;
                 j++;
@@ -81,7 +85,16 @@ static void setbitmap(int start, size_t size) {
     for (int i = start; i < start+size; i++) {
         bitmap[i] = 1;
     }
-    bitmap[start] = size;
+    if (size > 126) {
+        int quotient = size / 126, remainder = size % 126;
+        // set cumaltive value of overall chunk size across bits ("on top of" bit state e.g. 1 or 0)
+        for (int i = start; i < quotient; i++) {
+            bitmap[i] += 126;
+        }
+        if (remainder > 0) bitmap[start+quotient] += remainder;
+    } else {
+        bitmap[start] += size;
+    }
 }
 
 static int getsmallestfreespace(size_t size) {
