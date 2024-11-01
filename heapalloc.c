@@ -33,6 +33,7 @@ static void heapinit() {
 static int getSmallestFreeSpace(size_t size);
 
 void* heapalloc(size_t size) {
+    if (size > 127) throwerror("Sizes greater than 127 bits not supported");
     if (heapdata.heap == NULL) heapinit();
     if (size > heapdata.freedspace) throwerror("Reached max heap capacity");
     if (size < 1) throwerror("Must request size greater than 0");
