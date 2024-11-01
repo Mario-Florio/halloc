@@ -9,7 +9,7 @@ char bitmap[CAPACITY] = { 0 * CAPACITY };
 
 typedef struct {
     void* start;
-    int free_space;
+    size_t free_space;
 } Heap;
 
 static Heap heap;
