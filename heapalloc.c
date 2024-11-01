@@ -89,7 +89,7 @@ static int getSmallestFreeSpace(size_t size) {
     int currIdx = 0, currSpace = 0, found = 0;
     int smallestIdx = 0, smallestSpace = CAPACITY+1;
 
-    for (int i = 0; i < CAPACITY; i++) {
+    for (int i = 0; i < CAPACITY+1; i++) {
         if (currSpace == size) found = 1;
         if (smallestSpace == size) break;
         if (bitmap[i] == 0) {
