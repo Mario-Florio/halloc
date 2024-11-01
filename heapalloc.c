@@ -57,9 +57,9 @@ void heapfree(void* ptr) {
     int chunksize = 0;
     for (int i = 0; i < CAPACITY; i++) {
         if (heapdata.heap+i == ptr) {
-            chunksize = bitmap[i]+i;
+            chunksize = bitmap[i];
             int j = i;
-            while (j < chunksize) {
+            while (j < chunksize+i) {
                 bitmap[j] = 0;
                 j++;
             }
