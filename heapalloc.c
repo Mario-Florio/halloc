@@ -35,7 +35,7 @@ void* heapalloc(size_t size) {
     if (size > heap.free_space) throwerror("Reached max heap capacity");
     if (size < 1) throwerror("Must request size greater than 0");
 
-    // get smallest free space in bitmap
+    // get starting index of smallest free space in bitmap
     int start = getsmallestfreespace(size);
 
     if (start == -1) throwerror("Unable to fulfill request");
