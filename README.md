@@ -11,7 +11,7 @@ Internally, it manages a fixed 640KB region via `mmap`, tracks allocations with 
 
 ---
 
-## hpalloc
+## halloc
 
 ```c
 void* halloc(size_t size);
