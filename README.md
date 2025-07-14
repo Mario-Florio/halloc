@@ -1,24 +1,48 @@
-# heapalloc
-A basic heap allocator in C.
+# halloc
 
-The goal of heapalloc is to replicate the basic functionality of memory management found within the C standard library. The particular functions being mimicked are ```malloc``` and ```free```. Therefore heapalloc will expose two functions:
-- ```halloc```
-- ```hfree```
+A basic heap allocator in C that replicates core functionality of `malloc` and `free`.
 
-## halloc
+This project exposes two functions:
+
+- `halloc(size_t size)`
+- `hfree(void* ptr)`
+
+Internally, it manages a fixed 640KB region via `mmap`, tracks allocations with a custom bitmap, and performs linear scanning for free blocks.
+
+---
+
+## hpalloc
+
 ```c
-    void* halloc(size_t size);
+void* halloc(size_t size);
 ```
-Being a replica of malloc, halloc will allocate a specified amount of bytes and returns a pointer to the uninitialized memory space. Unlike malloc, halloc considers a size of 0 unintended behavior and consequently will exit.
+Allocates ```size``` bytes of memory from the managed heap. Returns a pointer to uninitialized memory. Unlike ```malloc```, a request of size 0 is considered invalid and will terminate the program.
 
-#### Parameters
-```size```: number of bytes to allocate
+#### Parameters:
+* ```size```: number of bytes to allocate (must be > 0)
+
+#### Behavior:
+* If no sufficient space is available, the allocator exits with an error.
+* All allocations are tracked using a simple bitmap scheme with encoded chunk size metadata.
+
+---
 
 ## hfree
 ```c
-    void hfree(void* ptr);
+void hfree(void* ptr);
 ```
-Similar to free, hfree deallocates memory space allocates by halloc——hfree does not return a value. Passing both a pointer to a memory space which has not been previously allocated with halloc, or has already been freed with hfree, is considered unintended behavior and will cause hfree to exit.
+Deallocates a memory block previously returned by ```halloc```.
 
-#### Parameters
-```ptr```: memory space to deallocate
+#### Parameters:
+* ```ptr```: memory space to deallocate
+
+#### Behavior:
+* If the pointer was never allocated or has already been freed, the function terminates the program.
+* Successfully freeing memory updates the internal bitmap and heap state.
+
+---
+
+## Notes
+* Total managed heap capacity is statically fixed at 640,000 bytes.
+* This is a toy allocator for learning and experimentation purposes.
+* No alignment guarantees or thread safety are provided.
